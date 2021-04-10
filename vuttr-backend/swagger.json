@@ -1,0 +1,458 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Very Useful Tools to Remember",
+    "description": "A simple application to organize tools",
+    "contact": {
+      "name": "Marcelo Boff",
+      "email": "marceloboff20@gmail.com"
+    },
+    "servers": [
+      "http://localhost:3000"
+    ]
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number",
+          "example": 0
+        },
+        "name": {
+          "type": "string",
+          "example": "John Doe"
+        },
+        "email": {
+          "type": "string",
+          "example": "johndoe@email.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "123456"
+        }
+      }
+    },
+    "Tool": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number",
+          "example": 0
+        },
+        "title": {
+          "type": "string",
+          "example": "title 1"
+        },
+        "link": {
+          "type": "string",
+          "example": "link 1"
+        },
+        "description": {
+          "type": "string",
+          "example": "description 1"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "example": "tag 1"
+          }
+        }
+      }
+    },
+    "Favorite": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number",
+          "example": 0
+        },
+        "user_id": {
+          "type": "number",
+          "example": 0
+        },
+        "tool_id": {
+          "type": "number",
+          "example": 0
+        },
+        "tool": {
+          "$ref": "#/definitions/Tool"
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Session",
+      "description": "Authentication"
+    },
+    {
+      "name": "User",
+      "description": "Users operations"
+    },
+    {
+      "name": "Tool",
+      "description": "Tools operations"
+    },
+    {
+      "name": "Favorite",
+      "description": "Favorites operations"
+    }
+  ],
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "paths": {
+    "/sessions": {
+      "post": {
+        "tags": [
+          "Session"
+        ],
+        "description": "Create a session",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Creata a session",
+            "schema": {
+              "type": "object",
+              "required": [
+                "email",
+                "password"
+              ],
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "johndoe@email.com"
+                },
+                "password": {
+                  "type": "string",
+                  "example": 123456
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successfully created a session",
+            "schema": {
+              "properties": {
+                "user": {
+                  "$ref": "#/definitions/User"
+                },
+                "token": {
+                  "type": "string",
+                  "example": "saf53dg1t34h35f4hg351sdvdsvdh"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parameters validation error"
+          }
+        }
+      }
+    },
+    "/users": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "description": "Creata a new user",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Creata a new user",
+            "schema": {
+              "type": "object",
+              "required": [
+                "name",
+                "email",
+                "password"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "John Doe"
+                },
+                "email": {
+                  "type": "string",
+                  "example": "johndoe@email.com"
+                },
+                "password": {
+                  "type": "string",
+                  "example": 123456
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successfully created user",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "description": "Parameters validation error"
+          }
+        }
+      }
+    },
+    "/tools": {
+      "get": {
+        "tags": [
+          "Tool"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "description": "All tools in database",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "tag",
+            "in": "query",
+            "description": "Tool filterd by tag",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Return all in database",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Tool"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Tool"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "description": "Create a new tool",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Create a new tool",
+            "schema": {
+              "type": "object",
+              "required": [
+                "title",
+                "link",
+                "description",
+                "tags"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "example": "Tool 1"
+                },
+                "link": {
+                  "type": "string",
+                  "example": "Link 1"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "Description 1"
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "example": "tag1, tag2"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successfully created tool",
+            "schema": {
+              "$ref": "#/definitions/Tool"
+            }
+          },
+          "400": {
+            "description": "Parameters validation error"
+          }
+        }
+      }
+    },
+    "/tools/{toolId}": {
+      "delete": {
+        "tags": [
+          "Tool"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "description": "Delete one tool",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "toolId",
+            "required": true,
+            "in": "path",
+            "description": "Delete one tool",
+            "type": "number"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully delete tool"
+          }
+        }
+      }
+    },
+    "/favorites": {
+      "get": {
+        "tags": [
+          "Favorite"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "description": "All favorites relations",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Return all favorites ralations of user",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Favorite"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/favorites/{toolId}": {
+      "post": {
+        "tags": [
+          "Favorite"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "description": "Add tool in favorites",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "toolId",
+            "required": true,
+            "in": "path",
+            "description": "Add tool in favorites",
+            "type": "number"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successfully add tool in favorites",
+            "schema": {
+              "$ref": "#/definitions/Favorite"
+            }
+          },
+          "400": {
+            "description": "Favorite relation already exists"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Favorite"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "description": "Delete one favorite",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "description": "Bearer token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "toolId",
+            "required": true,
+            "in": "path",
+            "description": "Delete one favorite",
+            "type": "number"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successfully delete favorite"
+          }
+        }
+      }
+    }
+  },
+  "responses": {},
+  "parameters": {}
+}
